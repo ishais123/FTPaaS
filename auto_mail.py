@@ -1,19 +1,24 @@
 #!/usr/bin/python3.6
 
-import boto3 from botocore.exceptions import ClientError def auto_mail(receive, company, password):
-    print (company)
-    print (password)
+import boto3
+from botocore.exceptions import ClientError
+from slackbot_v2 import config
+
+
+def auto_mail(receive, company, password):
     # Replace sender@example.com with your "From" address. This address must be verified with Amazon SES.
-    SENDER = "avivshaar6@gmail.com <avivshaar6@gmail.com>"
+    SENDER = config.SENDER
     
-    # Replace recipient@example.com with a "To" address. If your account is still in the sandbox, this address must be verified.
+    # Replace recipient@example.com with a "To" address.
+    # If your account is still in the sandbox, this address must be verified.
     RECIPIENT = f"receiver Name <{receive}>"
     
-    # Specify a configuration set. If you do not want to use a configuration set, comment the following variable, and the ConfigurationSetName=CONFIGURATION_SET argument below.
+    # Specify a configuration set. If you do not want to use a configuration set,
+    # comment the following variable, and the ConfigurationSetName=CONFIGURATION_SET argument below.
     CONFIGURATION_SET = "ConfigSet"
     
     # If necessary, replace us-west-2 with the AWS Region you're using for Amazon SES.
-    AWS_REGION = "us-east-1"
+    AWS_REGION = config.AWS_REGION
     
     # The subject line for the email.
     SUBJECT = "welcome to Terasky SFTP!"
@@ -38,11 +43,11 @@ import boto3 from botocore.exceptions import ClientError def auto_mail(receive, 
     CHARSET = "UTF-8"
     
     # Create a new SES resource and specify a region.
-    client = boto3.client('ses',region_name=AWS_REGION)
+    client = boto3.client('ses', region_name=AWS_REGION)
     
     # Try to send the email.
     try:
-        #Provide the contents of the email.
+        # Provide the contents of the email.
         response = client.send_email(
             Destination={
                 'ToAddresses': [
@@ -66,18 +71,20 @@ import boto3 from botocore.exceptions import ClientError def auto_mail(receive, 
                 },
             },
             Source=SENDER,
-            # If you are not using a configuration set, comment or delete the following line ConfigurationSetName=CONFIGURATION_SET,
+            # If you are not using a configuration set,
+            # comment or delete the following line ConfigurationSetName=CONFIGURATION_SET,
         )
     # Display an error if something goes wrong.
     except ClientError as e:
-        # print("hee")
         print(e.response['Error']['Message'])
     else:
         print("Email sent! Message ID:"),
         print(response['MessageId'])
-    
+
+
 def lambda_handler(event, lambda_context):
     receive = event['receive']
     company = event['company']
     password = event['password']
-    auto_mail(receive,company,password)
+    auto_mail(receive, company, password)
+

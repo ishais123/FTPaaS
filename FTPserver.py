@@ -1,10 +1,8 @@
 #!/usr/bin/python3.6
 
-import boto3
-import botocore
 import paramiko
-import subprocess
-import config
+from slackbot_v2 import config
+
 
 def add_user(company, password):
     key = paramiko.RSAKey.from_private_key_file(config.EC2_KEY)
@@ -17,9 +15,11 @@ def add_user(company, password):
         stdin, stdout, stderr = client.exec_command(f"add_user {company} {password}")
         client.close()
     except:
-        print ("Something wrong")
+        print("Something wrong")
+
 
 def lambda_handler(event, lambda_context):
     company = event['company']
     password = event['password']
     add_user(company, password)
+
